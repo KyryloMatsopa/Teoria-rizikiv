@@ -1,0 +1,41 @@
+def calculate_bank_expectation(pr_bank, deposit, rate):
+    """Очікувана вартість для вкладу в банк."""
+    return pr_bank * (deposit + deposit * rate) + (1 - pr_bank) * deposit
+
+def calculate_stock_expectation(pr_success, deposit, rate):
+    """Очікувана вартість для інвестування в акції."""
+    return pr_success * (deposit + deposit * rate) + (1 - pr_success) * 0
+
+def find_stock_probability_bound(pr_bank, deposit, rate_bank, rate_stock):
+    """Знайти межу ймовірності, за якої інвестування в акції вигідніше."""
+    for pr_success in range(0, 101):
+        pr_success /= 100  # Переводимо у відсотки
+        e_bank = calculate_bank_expectation(pr_bank, deposit, rate_bank)
+        e_stock = calculate_stock_expectation(pr_success, deposit, rate_stock)
+        if e_stock > e_bank:
+            return pr_success
+    return None
+
+def main():
+    deposit = 2500  # Початкова сума вкладення
+    rate_bank = 0.04  # Ставка в банку (4%)
+    rate_stock = 0.208  # Ставка акцій (20.8%)
+    pr_bank = 0.99  # Імовірність виплати в банку
+    pr_stock_success = 0.5  # Імовірність успіху акцій
+
+    # Обчислення очікуваної вартості
+    e_bank = calculate_bank_expectation(pr_bank, deposit, rate_bank)
+    e_stock = calculate_stock_expectation(pr_stock_success, deposit, rate_stock)
+
+    print(f"Очікувана вартість вкладення в банк: {e_bank:.2f}")
+    print(f"Очікувана вартість вкладення в акції (P успіху = 0.5): {e_stock:.2f}")
+
+    # Знайти мінімальну ймовірність успіху для вибору акцій
+    min_pr_stock = find_stock_probability_bound(pr_bank, deposit, rate_bank, rate_stock)
+    if min_pr_stock is not None:
+        print(f"Мінімальна ймовірність успішної діяльності АТ: {min_pr_stock * 100:.2f}%")
+    else:
+        print("Інвестування в акції не вигідно для жодної ймовірності успіху.")
+
+if __name__ == "__main__":
+    main()
