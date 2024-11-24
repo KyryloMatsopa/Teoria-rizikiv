@@ -1,0 +1,52 @@
+import numpy as np
+
+# Дані про акції
+expected_returns = np.array([0.2, 0.4, 0.6])  # Сподівані норми прибутків
+std_devs = np.array([0.1, 0.18, 0.3])  # Середньоквадратичні відхилення
+
+# Коефіцієнти кореляції
+correlation_matrix = np.array([
+    [1, 1, -1],  # ρ12 = 1, ρ13 = -1
+    [1, 1, -1],  # ρ12 = 1, ρ23 = -1
+    [-1, -1, 1]  # ρ13 = -1, ρ23 = -1
+])
+
+# Розрахунок коваліаційної матриці
+cov_matrix = np.outer(std_devs, std_devs) * correlation_matrix
+
+# Рішення a): Знаходимо ваги портфеля для максимального очікуваного прибутку
+# З обмеженням: сума ваг = 1
+from scipy.optimize import minimize
+
+def portfolio_stats(weights):
+    weights = np.array(weights)
+    expected_portfolio_return = np.sum(weights * expected_returns)
+    portfolio_variance = np.dot(weights.T, np.dot(cov_matrix, weights))
+    portfolio_std_dev = np.sqrt(portfolio_variance)
+    return expected_portfolio_return, portfolio_std_dev
+
+def negative_sharpe_ratio(weights):
+    ret, risk = portfolio_stats(weights)
+    return -ret / risk  # Максимізація Sharpe ratio
+
+# Початкові значення ваг
+num_assets = len(expected_returns)
+initial_weights = np.ones(num_assets) / num_assets
+
+# Обмеження: сума ваг = 1
+constraints = {'type': 'eq', 'fun': lambda w: np.sum(w) - 1}
+
+# Межі для ваг
+bounds = [(0, 1) for _ in range(num_assets)]
+
+# Мінімізація
+optimal = minimize(negative_sharpe_ratio, initial_weights, method='SLSQP', bounds=bounds, constraints=constraints)
+
+# Рішення b): Результати
+optimal_weights = optimal.x
+optimal_return, optimal_risk = portfolio_stats(optimal_weights)
+
+# Вивід результатів
+print("Оптимальна структура ПЦП (ваги):", optimal_weights)
+print(f"Сподівана норма прибутку: {optimal_return:.4f}")
+print(f"Ризик (середньоквадратичне відхилення): {optimal_risk:.4f}")
