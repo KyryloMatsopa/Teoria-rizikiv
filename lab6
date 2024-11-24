@@ -1,0 +1,26 @@
+import numpy as np
+
+# Вихідні дані
+F_minus = np.array([
+    [8, 10],
+    [12, 8],
+    [10, 8],
+    [4, 12]
+])
+
+F_plus = np.array([
+    [100, 160],
+    [120, 140],
+    [110, 150],
+    [150, 120]
+])
+
+lambda_coef = 0.7  # Коефіцієнт Ходжеса-Лемана
+
+# Обчислення критерію Ходжеса-Лемана
+H_values = lambda_coef * np.max(F_plus, axis=1) + (1 - lambda_coef) * np.min(F_minus, axis=1)
+optimal_strategy = np.argmax(H_values) + 1  # Номер оптимальної стратегії (нумерація з 1)
+
+# Виведення результатів
+print("Значення критерію Ходжеса-Лемана для кожної стратегії:", H_values)
+print("Оптимальна стратегія:", optimal_strategy)
