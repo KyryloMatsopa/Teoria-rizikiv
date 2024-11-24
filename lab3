@@ -1,0 +1,24 @@
+import numpy as np
+
+# Функція корисності
+def utility(x):
+    return np.sqrt(x + 5) / 15
+
+# Дані з таблиці
+profits = {
+    "I": [10, -5, -5],
+    "II": [-5, -5, 10],
+    "III": [1.5, 1.5, 0],
+    "IV": [0, 0, 0],
+}
+probabilities = [0.5, 0.1, 0.4]  # Ймовірності
+
+# Розрахунок очікуваної корисності для кожного рішення
+expected_utilities = {}
+for decision, outcomes in profits.items():
+    expected_utility = sum(utility(x) * p for x, p in zip(outcomes, probabilities))
+    expected_utilities[decision] = expected_utility
+
+# Виведення результатів
+for decision, expected_utility in expected_utilities.items():
+    print(f"Рішення {decision}: Очікувана корисність = {expected_utility:.4f}")
